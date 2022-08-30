@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Note</string>
+    <string name="more">More</string>
+    <string name="Less">Less</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 </resources>
