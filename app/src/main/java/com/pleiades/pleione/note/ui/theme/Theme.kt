@@ -16,15 +16,15 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = PurpleLight,
-    secondary = PurpleLightGrey,
-    tertiary = PinkLight
+//    primary = PurpleLight,
+//    secondary = PurpleLightGrey,
+//    tertiary = PinkLight
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = PurpleDark,
-    secondary = PurpleDarkGrey,
-    tertiary = PinkDark
+    primary = Purple,
+    secondary = PurpleLight,
+    tertiary = PurpleWhite
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -49,13 +49,14 @@ fun NoteTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColorScheme
+        darkTheme -> LightColorScheme //DarkColorScheme
         else -> LightColorScheme
     }
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
+            (view.context as Activity).window.navigationBarColor = colorScheme.primary.toArgb()
             ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
         }
     }
