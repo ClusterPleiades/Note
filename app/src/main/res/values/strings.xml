@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">Note</string>
+
+    <string name="back">Back</string>
+
+    <string name="title">Title</string>
+    <string name="summary">Summary</string>
+    <string name="content">Content</string>
+
     <string name="more">More</string>
     <string name="Less">Less</string>
     <string name="edit">Edit</string>

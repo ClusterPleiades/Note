@@ -9,5 +9,5 @@ data class Note(
     @PrimaryKey val time: Long,
     @ColumnInfo var title: String,
     @ColumnInfo var summary: String,
-    @ColumnInfo var contents: String
+    @ColumnInfo var content: String
 )

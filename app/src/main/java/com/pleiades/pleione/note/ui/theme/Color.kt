@@ -10,3 +10,5 @@ import androidx.compose.ui.graphics.Color
 val Purple = Color(0xFF575992)
 val PurpleLight = Color(0xFFE3E0FA)
 val PurpleWhite = Color(0xFFFCF8FE)
+
+val Transparent = Color(0x00FFFFFF)

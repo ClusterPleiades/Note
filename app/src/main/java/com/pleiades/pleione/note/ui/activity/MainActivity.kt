@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+
 package com.pleiades.pleione.note.ui.activity
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +12,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,24 +24,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.pleiades.pleione.note.ui.theme.NoteTheme
-import com.pleiades.pleione.note.ui.theme.Purple
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pleiades.pleione.note.R
 import com.pleiades.pleione.note.data.Note
-import com.pleiades.pleione.note.ui.theme.PurpleLight
-import com.pleiades.pleione.note.ui.theme.PurpleWhite
+import com.pleiades.pleione.note.ui.theme.*
+import com.pleiades.pleione.note.ui.viewmodel.MainViewModel
 
-class NoteActivity : ComponentActivity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        applicationContext
-
         setContent {
-            NoteTheme {
+            MainTheme {
                 DrawScaffold()
             }
         }
@@ -48,22 +47,25 @@ class NoteActivity : ComponentActivity() {
 
 @Preview(showBackground = true)
 @Composable
-fun DrawPreview() {
-    NoteTheme {
+private fun DrawPreview() {
+    MainTheme {
         DrawScaffold()
     }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DrawScaffold(modifier: Modifier = Modifier, viewModel: NoteViewModel = viewModel()) {
+private fun DrawScaffold(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
+    val context = LocalContext.current
+
     Scaffold(
         modifier = modifier,
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
             LargeFloatingActionButton(
-                onClick = { /* TODO */ },
+                onClick = {
+                    context.startActivity(Intent(context, AddActivity::class.java))
+                },
                 shape = RoundedCornerShape(128.dp),
                 containerColor = Purple,
             ) {
@@ -71,13 +73,14 @@ fun DrawScaffold(modifier: Modifier = Modifier, viewModel: NoteViewModel = viewM
             }
         }
     ) {
-        val notes by viewModel.notes.collectAsState(initial = emptyList())
+//        val notes by viewModel.notes.collectAsState(initial = emptyList())
+        val notes = viewModel.notes
         DrawLazyColumn(notes)
     }
 }
 
 @Composable
-fun DrawLazyColumn(notes: List<Note>) {
+private fun DrawLazyColumn(notes: List<Note>) {
     Surface(color = PurpleWhite) {
         Surface(
             modifier = Modifier
@@ -87,18 +90,15 @@ fun DrawLazyColumn(notes: List<Note>) {
         ) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 itemsIndexed(items = notes) { _, note ->
-                    DrawLazyItem(title = note.title, summary = note.summary, contents = note.contents)
+                    DrawLazyItem(title = note.title, summary = note.summary, contents = note.content)
                 }
-//                items(items = notes) { note ->
-//                    DrawLazyItem(title = note.title, summary = note.summary, contents = note.contents)
-//                }
             }
         }
     }
 }
 
 @Composable
-fun DrawLazyItem(title: String, summary: String, contents: String) {
+private fun DrawLazyItem(title: String, summary: String, contents: String) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     Surface(
