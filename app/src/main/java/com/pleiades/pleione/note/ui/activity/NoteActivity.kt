@@ -10,6 +10,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -32,9 +33,10 @@ import com.pleiades.pleione.note.data.Note
 import com.pleiades.pleione.note.ui.theme.PurpleLight
 import com.pleiades.pleione.note.ui.theme.PurpleWhite
 
-class MainActivity : ComponentActivity() {
+class NoteActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        applicationContext
 
         setContent {
             NoteTheme {
@@ -55,7 +57,7 @@ fun DrawPreview() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DrawScaffold(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
+fun DrawScaffold(modifier: Modifier = Modifier, viewModel: NoteViewModel = viewModel()) {
     Scaffold(
         modifier = modifier,
         floatingActionButtonPosition = FabPosition.Center,
@@ -69,9 +71,8 @@ fun DrawScaffold(modifier: Modifier = Modifier, viewModel: MainViewModel = viewM
             }
         }
     ) {
-//        val arrayList = arrayListOf<String>()
-//        for (i in 1..5) arrayList.add(i.toString())
-        DrawLazyColumn(viewModel.notes)
+        val notes by viewModel.notes.collectAsState(initial = emptyList())
+        DrawLazyColumn(notes)
     }
 }
 
@@ -81,12 +82,16 @@ fun DrawLazyColumn(notes: List<Note>) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 12.dp, start = 12.dp, end = 12.dp)
+                .padding(top = 12.dp, start = 12.dp, end = 12.dp),
+            color = PurpleWhite
         ) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(items = notes) { note ->
+                itemsIndexed(items = notes) { _, note ->
                     DrawLazyItem(title = note.title, summary = note.summary, contents = note.contents)
                 }
+//                items(items = notes) { note ->
+//                    DrawLazyItem(title = note.title, summary = note.summary, contents = note.contents)
+//                }
             }
         }
     }
