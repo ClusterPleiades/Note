@@ -2,6 +2,7 @@
     <string name="app_name">Note</string>
 
     <string name="back">Back</string>
+    <string name="no_named">No Named</string>
 
     <string name="title">Title</string>
     <string name="summary">Summary</string>
@@ -9,6 +10,8 @@
 
     <string name="more">More</string>
     <string name="Less">Less</string>
+
+    <string name="save">save</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
 </resources>

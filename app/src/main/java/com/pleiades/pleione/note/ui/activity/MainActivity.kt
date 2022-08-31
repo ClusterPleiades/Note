@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MainTheme {
-                DrawScaffold()
+                ComposeScaffold()
             }
         }
     }
@@ -47,15 +47,15 @@ class MainActivity : ComponentActivity() {
 
 @Preview(showBackground = true)
 @Composable
-private fun DrawPreview() {
+private fun ComposePreview() {
     MainTheme {
-        DrawScaffold()
+        ComposeScaffold()
     }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-private fun DrawScaffold(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
+private fun ComposeScaffold(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
     val context = LocalContext.current
 
     Scaffold(
@@ -75,12 +75,12 @@ private fun DrawScaffold(modifier: Modifier = Modifier, viewModel: MainViewModel
     ) {
 //        val notes by viewModel.notes.collectAsState(initial = emptyList())
         val notes = viewModel.notes
-        DrawLazyColumn(notes)
+        ComposeNotes(notes)
     }
 }
 
 @Composable
-private fun DrawLazyColumn(notes: List<Note>) {
+private fun ComposeNotes(notes: List<Note>) {
     Surface(color = PurpleWhite) {
         Surface(
             modifier = Modifier
@@ -90,7 +90,7 @@ private fun DrawLazyColumn(notes: List<Note>) {
         ) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 itemsIndexed(items = notes) { _, note ->
-                    DrawLazyItem(title = note.title, summary = note.summary, contents = note.content)
+                    ComposeNotesItem(title = note.title, summary = note.summary, contents = note.content)
                 }
             }
         }
@@ -98,7 +98,7 @@ private fun DrawLazyColumn(notes: List<Note>) {
 }
 
 @Composable
-private fun DrawLazyItem(title: String, summary: String, contents: String) {
+private fun ComposeNotesItem(title: String, summary: String, contents: String) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     Surface(
@@ -148,13 +148,13 @@ private fun DrawLazyItem(title: String, summary: String, contents: String) {
                 Text(modifier = Modifier.padding(end = 8.dp), text = contents)
                 Row(modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)) {
                     Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Done,
-                            contentDescription = stringResource(R.string.edit),
-                            tint = Purple
-                        )
-                    }
+//                    IconButton(onClick = { /*TODO*/ }) {
+//                        Icon(
+//                            imageVector = Icons.Filled.Done,
+//                            contentDescription = stringResource(R.string.edit),
+//                            tint = Purple
+//                        )
+//                    }
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(
                             imageVector = Icons.Filled.Clear,
