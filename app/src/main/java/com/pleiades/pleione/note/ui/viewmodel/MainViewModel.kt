@@ -14,30 +14,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val notes = noteDao.getNotes()
 
     @WorkerThread
-    suspend fun insert(note: Note) {
+    fun insert(note: Note) {
         noteDao.insertNote(note)
     }
 
     @WorkerThread
-    suspend fun update(note: Note) {
+    fun update(note: Note) {
         noteDao.updateNote(note)
     }
 
     @WorkerThread
-    suspend fun delete(note: Note) {
+    fun delete(note: Note) {
         noteDao.deleteNote(note)
     }
-
-//    private fun temp(): List<Note> {
-//        val arrayList = arrayListOf<Note>()
-//        for (i in 1..5) arrayList.add(
-//            Note(
-//                123123123,
-//                "Title",
-//                "I am chicken summary.",
-//                "temp contents temp contents temp contents temp contents temp contents temp contentstemp contentstemp contentstemp contentstemp contentstemp contentstemp contentstemp contentstemp contents"
-//            )
-//        )
-//        return arrayList
-//    }
 }

@@ -67,7 +67,7 @@ private fun ComposeScaffold(modifier: Modifier = Modifier, viewModel: MainViewMo
     val context = LocalContext.current
     val defaultTitle = stringResource(id = R.string.untitled)
     val defaultContent = stringResource(id = R.string.content)
-    val insertScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     val addResultLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data = result.data!!
@@ -75,7 +75,7 @@ private fun ComposeScaffold(modifier: Modifier = Modifier, viewModel: MainViewMo
             val content = data.getStringExtra(CONTENT) ?: defaultContent
             val summary = content.split("\\n")[0]
 
-            insertScope.launch(Dispatchers.IO) {
+            coroutineScope.launch(Dispatchers.IO) {
                 viewModel.insert(Note(System.currentTimeMillis(), title, summary, content))
             }
         }
@@ -97,12 +97,14 @@ private fun ComposeScaffold(modifier: Modifier = Modifier, viewModel: MainViewMo
         }
     ) {
         val notes by viewModel.notes.collectAsState(initial = emptyList())
-        ComposeNotes(notes)
+        ComposeNotes(notes, viewModel)
     }
 }
 
 @Composable
-private fun ComposeNotes(notes: List<Note>) {
+private fun ComposeNotes(notes: List<Note>, viewModel: MainViewModel) {
+    val coroutineScope = rememberCoroutineScope()
+
     Surface(color = PurpleWhite) {
         Surface(
             modifier = Modifier
@@ -112,7 +114,12 @@ private fun ComposeNotes(notes: List<Note>) {
         ) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 itemsIndexed(items = notes) { _, note ->
-                    ComposeNotesItem(title = note.title, summary = note.summary, contents = note.content)
+                    ComposeNotesItem(note,
+                        onDeleted = { item ->
+                            coroutineScope.launch(Dispatchers.IO) {
+                                viewModel.delete(item)
+                            }
+                        })
                 }
             }
         }
@@ -120,7 +127,7 @@ private fun ComposeNotes(notes: List<Note>) {
 }
 
 @Composable
-private fun ComposeNotesItem(title: String, summary: String, contents: String) {
+private fun ComposeNotesItem(note: Note, onDeleted: (Note) -> Unit) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     Surface(
@@ -143,13 +150,13 @@ private fun ComposeNotesItem(title: String, summary: String, contents: String) {
                         .padding(top = 8.dp, bottom = 16.dp)
                 ) {
                     Text(
-                        text = title,
+                        text = note.title,
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.ExtraBold
                         )
                     )
                     Spacer(Modifier.height(12.dp))
-                    Text(text = summary)
+                    Text(text = note.summary)
                 }
                 IconButton(
                     modifier = Modifier.padding(top = 4.dp),
@@ -167,7 +174,7 @@ private fun ComposeNotesItem(title: String, summary: String, contents: String) {
                 }
             }
             if (expanded) {
-                Text(modifier = Modifier.padding(end = 8.dp), text = contents)
+                Text(modifier = Modifier.padding(end = 8.dp), text = note.content)
                 Row(modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)) {
                     Spacer(modifier = Modifier.weight(1f))
 //                    IconButton(onClick = { /*TODO*/ }) {
@@ -177,7 +184,9 @@ private fun ComposeNotesItem(title: String, summary: String, contents: String) {
 //                            tint = Purple
 //                        )
 //                    }
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        onDeleted(note)
+                    }) {
                         Icon(
                             imageVector = Icons.Filled.Clear,
                             contentDescription = stringResource(R.string.delete),
