@@ -116,7 +116,7 @@ private fun ComposeNotes(notes: List<Note>, viewModel: MainViewModel) {
         ) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 itemsIndexed(items = notes) { _, note ->
-                    ComposeNotesItem(note,
+                    ComposeNotesItem(NoteItem(note),
                         onDeleted = { item ->
                             coroutineScope.launch(Dispatchers.IO) {
                                 viewModel.delete(item)
@@ -129,9 +129,7 @@ private fun ComposeNotes(notes: List<Note>, viewModel: MainViewModel) {
 }
 
 @Composable
-private fun ComposeNotesItem(note: Note, onDeleted: (Note) -> Unit) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
+private fun ComposeNotesItem(noteItem: NoteItem, onDeleted: (Note) -> Unit) {
     Surface(
         modifier = Modifier
             .animateContentSize(
@@ -152,21 +150,21 @@ private fun ComposeNotesItem(note: Note, onDeleted: (Note) -> Unit) {
                         .padding(top = 8.dp, bottom = 16.dp)
                 ) {
                     Text(
-                        text = note.title,
+                        text = noteItem.note.title,
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.ExtraBold
                         )
                     )
                     Spacer(Modifier.height(12.dp))
-                    Text(text = note.summary)
+                    Text(text = noteItem.note.summary)
                 }
                 IconButton(
                     modifier = Modifier.padding(top = 4.dp),
-                    onClick = { expanded = !expanded }) {
+                    onClick = { noteItem.expanded.value = !noteItem.expanded.value }) {
                     Icon(
                         modifier = Modifier.size(28.dp),
-                        imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                        contentDescription = if (expanded) {
+                        imageVector = if (noteItem.expanded.value) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                        contentDescription = if (noteItem.expanded.value) {
                             stringResource(R.string.Less)
                         } else {
                             stringResource(R.string.more)
@@ -175,19 +173,12 @@ private fun ComposeNotesItem(note: Note, onDeleted: (Note) -> Unit) {
                     )
                 }
             }
-            if (expanded) {
-                Text(modifier = Modifier.padding(end = 8.dp), text = note.content)
+            if (noteItem.expanded.value) {
+                Text(modifier = Modifier.padding(end = 8.dp), text = noteItem.note.content)
                 Row(modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)) {
                     Spacer(modifier = Modifier.weight(1f))
-//                    IconButton(onClick = { /*TODO*/ }) {
-//                        Icon(
-//                            imageVector = Icons.Filled.Done,
-//                            contentDescription = stringResource(R.string.edit),
-//                            tint = Purple
-//                        )
-//                    }
                     IconButton(onClick = {
-                        onDeleted(note)
+                        onDeleted(noteItem.note)
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Clear,
@@ -199,4 +190,8 @@ private fun ComposeNotesItem(note: Note, onDeleted: (Note) -> Unit) {
             }
         }
     }
+}
+
+data class NoteItem(val note: Note) {
+    var expanded = mutableStateOf(false)
 }
