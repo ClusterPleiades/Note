@@ -4,6 +4,7 @@ package com.pleiades.pleione.note.ui.activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,6 +27,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pleiades.pleione.note.Config.Companion.CONTENT
+import com.pleiades.pleione.note.Config.Companion.TITLE
 import com.pleiades.pleione.note.R
 import com.pleiades.pleione.note.ui.theme.*
 
@@ -51,6 +54,7 @@ private fun ComposePreview() {
 @Composable
 private fun ComposeScaffold() {
     val activity = LocalContext.current as Activity
+    val intent = activity.intent
     var title by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
@@ -67,12 +71,15 @@ private fun ComposeScaffold() {
                     BasicTextField(
                         modifier = Modifier.align(Alignment.CenterVertically),
                         value = title,
-                        onValueChange = { title = it },
+                        onValueChange = {
+                            title = it
+                            intent.putExtra(TITLE, title)
+                        },
                         textStyle = MaterialTheme.typography.bodyLarge.copy(),
                         decorationBox = { innerTextField ->
                             if (title.isEmpty()) {
                                 Text(
-                                    text = stringResource(id = R.string.no_named),
+                                    text = stringResource(id = R.string.untitled),
                                     style = MaterialTheme.typography.bodyLarge.copy(),
                                     color = Purple
                                 )
@@ -91,6 +98,7 @@ private fun ComposeScaffold() {
 @Composable
 private fun ComposeContent() {
     val activity = LocalContext.current as Activity
+    val intent = activity.intent
     var content by rememberSaveable { mutableStateOf("") }
 
     Surface(color = PurpleWhite) {
@@ -106,7 +114,10 @@ private fun ComposeContent() {
                 BasicTextField(
                     modifier = Modifier.padding(all = 16.dp),
                     value = content,
-                    onValueChange = { content = it },
+                    onValueChange = {
+                        content = it
+                        intent.putExtra(CONTENT, content)
+                    },
                     textStyle = MaterialTheme.typography.bodyLarge.copy(),
                     decorationBox = { innerTextField ->
                         if (content.isEmpty()) {
@@ -120,9 +131,12 @@ private fun ComposeContent() {
                     }
                 )
             }
-            Row(modifier = Modifier.padding(all = 12.dp)){
+            Row(modifier = Modifier.padding(all = 12.dp)) {
                 Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {
+                    activity.setResult(RESULT_OK, intent)
+                    activity.finish()
+                }) {
                     Icon(
                         imageVector = Icons.Filled.Done,
                         contentDescription = stringResource(R.string.edit),
@@ -139,9 +153,4 @@ private fun ComposeContent() {
             }
         }
     }
-}
-
-@Composable
-private fun ComposeButton() {
-
 }

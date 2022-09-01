@@ -3,10 +3,14 @@
 package com.pleiades.pleione.note.ui.activity
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -29,10 +33,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pleiades.pleione.note.Config.Companion.CONTENT
+import com.pleiades.pleione.note.Config.Companion.TITLE
 import com.pleiades.pleione.note.R
 import com.pleiades.pleione.note.data.Note
 import com.pleiades.pleione.note.ui.theme.*
 import com.pleiades.pleione.note.ui.viewmodel.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +65,21 @@ private fun ComposePreview() {
 @Composable
 private fun ComposeScaffold(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
     val context = LocalContext.current
+    val defaultTitle = stringResource(id = R.string.untitled)
+    val defaultContent = stringResource(id = R.string.content)
+    val insertScope = rememberCoroutineScope()
+    val addResultLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data!!
+            val title = data.getStringExtra(TITLE) ?: defaultTitle
+            val content = data.getStringExtra(CONTENT) ?: defaultContent
+            val summary = content.split("\\n")[0]
+
+            insertScope.launch(Dispatchers.IO) {
+                viewModel.insert(Note(System.currentTimeMillis(), title, summary, content))
+            }
+        }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -64,7 +87,7 @@ private fun ComposeScaffold(modifier: Modifier = Modifier, viewModel: MainViewMo
         floatingActionButton = {
             LargeFloatingActionButton(
                 onClick = {
-                    context.startActivity(Intent(context, AddActivity::class.java))
+                    addResultLauncher.launch(Intent(context, AddActivity::class.java))
                 },
                 shape = RoundedCornerShape(128.dp),
                 containerColor = Purple,
@@ -73,8 +96,7 @@ private fun ComposeScaffold(modifier: Modifier = Modifier, viewModel: MainViewMo
             }
         }
     ) {
-//        val notes by viewModel.notes.collectAsState(initial = emptyList())
-        val notes = viewModel.notes
+        val notes by viewModel.notes.collectAsState(initial = emptyList())
         ComposeNotes(notes)
     }
 }
