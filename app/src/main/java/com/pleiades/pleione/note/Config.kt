@@ -9,5 +9,6 @@ class Config {
         // intent extra
         const val TITLE = "title"
         const val CONTENT = "content"
+        const val SUMMARY = "summary"
     }
 }

@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pleiades.pleione.note.Config.Companion.CONTENT
+import com.pleiades.pleione.note.Config.Companion.SUMMARY
 import com.pleiades.pleione.note.Config.Companion.TITLE
 import com.pleiades.pleione.note.R
 import com.pleiades.pleione.note.data.Note
@@ -66,14 +67,15 @@ private fun ComposePreview() {
 private fun ComposeScaffold(modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
     val context = LocalContext.current
     val defaultTitle = stringResource(id = R.string.untitled)
+    val defaultSummary = stringResource(id = R.string.summary)
     val defaultContent = stringResource(id = R.string.content)
     val coroutineScope = rememberCoroutineScope()
     val addResultLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data = result.data!!
             val title = data.getStringExtra(TITLE) ?: defaultTitle
+            val summary = data.getStringExtra(SUMMARY) ?: defaultSummary
             val content = data.getStringExtra(CONTENT) ?: defaultContent
-            val summary = content.split("\\n")[0]
 
             coroutineScope.launch(Dispatchers.IO) {
                 viewModel.insert(Note(System.currentTimeMillis(), title, summary, content))

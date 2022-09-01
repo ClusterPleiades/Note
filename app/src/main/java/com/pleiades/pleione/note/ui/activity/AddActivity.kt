@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pleiades.pleione.note.Config.Companion.CONTENT
+import com.pleiades.pleione.note.Config.Companion.SUMMARY
 import com.pleiades.pleione.note.Config.Companion.TITLE
 import com.pleiades.pleione.note.R
 import com.pleiades.pleione.note.ui.theme.*
@@ -99,10 +100,38 @@ private fun ComposeScaffold() {
 private fun ComposeContent() {
     val activity = LocalContext.current as Activity
     val intent = activity.intent
+    var summary by rememberSaveable { mutableStateOf("") }
     var content by rememberSaveable { mutableStateOf("") }
 
     Surface(color = PurpleWhite) {
         Column {
+            Surface(
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 12.dp, end = 12.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .fillMaxWidth(),
+                color = PurpleLight
+            ) {
+                BasicTextField(
+                    modifier = Modifier.padding(all = 16.dp),
+                    value = summary,
+                    onValueChange = {
+                        summary = it
+                        intent.putExtra(SUMMARY, summary)
+                    },
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(),
+                    decorationBox = { innerTextField ->
+                        if (summary.isEmpty()) {
+                            Text(
+                                text = stringResource(id = R.string.summary),
+                                style = MaterialTheme.typography.bodyLarge.copy(),
+                                color = Purple
+                            )
+                        }
+                        innerTextField()
+                    }
+                )
+            }
             Surface(
                 modifier = Modifier
                     .padding(top = 8.dp, start = 12.dp, end = 12.dp)
